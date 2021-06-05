@@ -1,0 +1,45 @@
+use tui::backend::Backend;
+use tui::Frame;
+use tui::layout::{Constraint, Direction, Layout};
+use tui::widgets::{Block, Borders};
+
+pub fn draw<B: Backend>(f: &mut Frame<B>) {
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([
+            Constraint::Percentage(10),
+            Constraint::Percentage(80),
+            Constraint::Percentage(10)
+        ].as_ref())
+        .split(f.size());
+
+    let midsection = Layout::default()
+        .direction(Direction::Horizontal)
+        .margin(1)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(80)
+        ].as_ref())
+        .split(chunks[1]);
+
+    let top_block = Block::default()
+        .title("Top block!")
+        .borders(Borders::ALL);
+    f.render_widget(top_block, chunks[0]);
+
+    let sidebar = Block::default()
+        .title("Sidebar!")
+        .borders(Borders::ALL);
+    f.render_widget(sidebar, midsection[0]);
+
+    let main = Block::default()
+        .title("Main!")
+        .borders(Borders::ALL);
+    f.render_widget(main, midsection[1]);
+
+    let commandbar = Block::default()
+        .title("Log")
+        .borders(Borders::ALL);
+    f.render_widget(commandbar, chunks[2]);
+}
