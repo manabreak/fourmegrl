@@ -14,7 +14,10 @@ use tui::layout::{Constraint, Direction, Layout};
 use tui::Terminal;
 use tui::widgets::{Block, Borders};
 
+use crate::gamestate::GameState;
+
 mod ui;
+mod gamestate;
 
 enum Event<I> {
     Input(I)
@@ -48,8 +51,10 @@ fn main() -> Result<(), io::Error> {
 
     terminal.clear().unwrap();
 
+    let mut state = GameState::init();
+
     loop {
-        terminal.draw(|f| ui::draw(f)).unwrap();
+        terminal.draw(|f| ui::draw(f, &state)).unwrap();
         match rx.recv().unwrap() {
             Event::Input(event) => match event.code {
                 KeyCode::Char('q') => {

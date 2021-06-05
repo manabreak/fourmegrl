@@ -1,9 +1,13 @@
 use tui::backend::Backend;
 use tui::Frame;
 use tui::layout::{Constraint, Direction, Layout};
-use tui::widgets::{Block, Borders};
+use tui::style::Color;
+use tui::widgets::{Block, Borders, canvas::Canvas};
+use tui::widgets::canvas::{Map, MapResolution};
 
-pub fn draw<B: Backend>(f: &mut Frame<B>) {
+use crate::gamestate::GameState;
+
+pub fn draw<B: Backend>(f: &mut Frame<B>, state: &GameState) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
@@ -33,9 +37,17 @@ pub fn draw<B: Backend>(f: &mut Frame<B>) {
         .borders(Borders::ALL);
     f.render_widget(sidebar, midsection[0]);
 
-    let main = Block::default()
-        .title("Main!")
-        .borders(Borders::ALL);
+    let main = Canvas::default()
+        .block(Block::default().borders(Borders::ALL).title("World"))
+        .paint(|ctx| {
+            ctx.draw(&Map {
+                color: Color::White,
+                resolution: MapResolution::High,
+            });
+            ctx.print(state.player_x as f64, state.player_y as f64, "You are here", Color::Yellow);
+        })
+        .x_bounds([-180.0, 180.0])
+        .y_bounds([-90.0, 90.0]);
     f.render_widget(main, midsection[1]);
 
     let commandbar = Block::default()
